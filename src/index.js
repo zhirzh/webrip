@@ -2,7 +2,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+
 import App from './App';
 
 import styles from './index.css';
@@ -20,33 +20,28 @@ class Root {
 
     div.style.top = `${mediaElement.offsetTop}px`;
     div.style.left = `${mediaElement.offsetLeft}px`;
-
     div.style.width = `${mediaElement.offsetWidth}px`;
     div.style.height = `${mediaElement.offsetHeight}px`;
 
     this.div = div;
   }
 
-  hide() {
+  hide = () => {
     if (this.div.classList.contains(styles.hidden)) {
       return;
     }
 
     this.div.classList.add(styles.hidden);
-  }
+  };
 
-  show() {
+  show = () => {
     if (this.div.classList.contains(styles.hidden)) {
       this.div.classList.remove(styles.hidden);
     }
-  }
+  };
 
-  render() {
-    return this.div;
-  }
+  render = () => this.div;
 }
-
-window.Root = Root;
 
 function insertAfter(newNode: Node, referenceNode: Node) {
   if (!referenceNode.parentNode) {
@@ -63,27 +58,38 @@ function setAllMediaElements() {
   allMediaElements = [...allVideoElements, ...allAudioElements];
 }
 
+function hideRoot(root, toElement) {
+  // hide `rootNode` if `toElement` is not a decendent of `rootNode`
+
+  const rootNode = root.render();
+  if (rootNode.contains(toElement)) {
+    return;
+  }
+
+  root.hide();
+}
+
+function showRoot(root) {
+  root.show();
+}
+
 function mountAllRecorders() {
-  allMediaElements.forEach(mediaElement => {
+  allMediaElements.forEach((mediaElement) => {
     const root = new Root(mediaElement);
     const rootNode = root.render();
 
     insertAfter(rootNode, mediaElement);
+
+    // eslint-disable-next-line react/jsx-filename-extension
     ReactDOM.render(<App mediaElement={mediaElement} />, rootNode);
 
-    mediaElement.onmouseenter = () => {
-      root.show();
-    };
+    // eslint-disable-next-line no-param-reassign
+    mediaElement.onmouseenter = () => showRoot(root);
 
-    mediaElement.onmouseleave = rootNode.onmouseleave = e => {
-      // hide `rootNode` if `toElement` is not a decendent of `rootNode`
+    // eslint-disable-next-line no-param-reassign
+    mediaElement.onmouseleave = e => hideRoot(root, e.toElement);
 
-      if (rootNode.contains(e.toElement)) {
-        return;
-      }
-
-      root.hide();
-    };
+    rootNode.onmouseleave = e => hideRoot(root, e.toElement);
   });
 }
 
@@ -91,7 +97,7 @@ function mountAllRecorders() {
   setAllMediaElements();
 
   mountAllRecorders();
-})();
+}());
 
 /* pass media element count for bringing "in focus" */
 

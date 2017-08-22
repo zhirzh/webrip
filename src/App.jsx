@@ -1,6 +1,7 @@
 // @flow
 
 import React, { Component } from 'react';
+
 import styles from './App.css';
 
 import { MediaRecorder } from './types';
@@ -38,7 +39,7 @@ class App extends Component<Props, State> {
     });
 
     mediaElement.onplay = () => {
-      recorder.ondataavailable = e => {
+      recorder.ondataavailable = (e) => {
         this.blobs.push(e.data);
 
         if (mediaElement.currentTime > mediaElement.duration) {
@@ -96,11 +97,7 @@ class App extends Component<Props, State> {
 
     if (recorder === null) {
       return (
-        <button
-          key="startRecording"
-          className={styles.record}
-          onClick={this.startRecording}
-        >
+        <button key="startRecording" className={styles.record} onClick={this.startRecording}>
           ⏺
         </button>
       );
@@ -108,11 +105,7 @@ class App extends Component<Props, State> {
 
     if (recorder.state === 'recording') {
       return (
-        <button
-          key="stopRecording"
-          className={styles.stop}
-          onClick={this.stopRecording}
-        >
+        <button key="stopRecording" className={styles.stop} onClick={this.stopRecording}>
           ⏹
         </button>
       );

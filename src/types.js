@@ -1,7 +1,5 @@
 // @flow
 
-declare function captureStream(): MediaStream;
-
 declare class MediaRecorder {
   constructor(MediaStream, ?Object): MediaRecorder,
 
