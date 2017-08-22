@@ -1,0 +1,16 @@
+Eject                         ⏏
+Fast forward                  ⏩
+Info                          ℹ
+Pause                         ⏸
+Play                          ▶
+Play/Pause toggle             ⏯
+Record                        ⏺
+Reload Refresh                🔄
+Repeat (indefinitely          🔁
+Repeat once                   🔂
+Reverse                       ◀
+Rewind (Fast Backwards        ⏪
+Shuffle                       🔀
+Skip to the end or next       ⏭
+Skip to the start or previous ⏮
+Stop                          ⏹

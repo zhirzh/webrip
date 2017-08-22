@@ -1,15 +1,20 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
-  "icons": [
+  "manifest_version": 2,
+  "name": "My Cool Extension",
+  "version": "0.1",
+  "content_security_policy": "script-src 'self' http://localhost:8000 'unsafe-eval'; object-src 'self'",
+  "content_scripts": [
     {
-      "src": "favicon.ico",
-      "sizes": "192x192",
-      "type": "image/png"
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": ["content.js"]
     }
   ],
-  "start_url": "./index.html",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  }
 }
