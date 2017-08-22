@@ -10,10 +10,4 @@ declare class MediaRecorder {
   stop: Function,
 }
 
-declare class ClassList extends Array<string> {
-  contains(string): boolean,
-  add(string): void,
-  remove(string): void,
-}
-
-export { ClassList, MediaRecorder };
+export { MediaRecorder };
