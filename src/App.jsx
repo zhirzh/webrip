@@ -31,6 +31,7 @@ class App extends Component<Props, State> {
 
     const { mediaElement } = this.state;
 
+    // $FlowFixMe - flow v0.53.1 doesn't support `captureStream()`
     const mediaStream = mediaElement.captureStream();
     const recorder: MediaRecorder = new MediaRecorder(mediaStream, {
       mimeType: 'video/webm;codecs=H264',
