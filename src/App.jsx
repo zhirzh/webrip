@@ -97,7 +97,7 @@ class App extends Component<Props, State> {
 
     if (recorder === null) {
       return (
-        <button key="startRecording" className={styles.record} onClick={this.startRecording}>
+        <button className={styles.record} onClick={this.startRecording}>
           ⏺
         </button>
       );
@@ -105,7 +105,7 @@ class App extends Component<Props, State> {
 
     if (recorder.state === 'recording') {
       return (
-        <button key="stopRecording" className={styles.stop} onClick={this.stopRecording}>
+        <button className={styles.stop} onClick={this.stopRecording}>
           ⏹
         </button>
       );
@@ -120,7 +120,7 @@ class App extends Component<Props, State> {
     }
 
     return (
-      <button key="promptDownload" onClick={this.promptDownload}>
+      <button className={styles.download} onClick={this.promptDownload}>
         ⬇
       </button>
     );
