@@ -7,45 +7,52 @@ import App from './App';
 
 import styles from './index.css';
 
-let allMediaElements = [];
+let allMediaElements: Array<HTMLMediaElement> = [];
 
 class Root {
-  constructor(mediaElement) {
-    const self = document.createElement('div');
+  div: HTMLDivElement;
 
-    self.classList.add(styles.root);
-    self.classList.add(styles.hidden);
+  constructor(mediaElement: HTMLMediaElement) {
+    const div = (document.createElement('div'): any);
 
-    self.style.top = mediaElement.offsetTop;
-    self.style.left = mediaElement.offsetLeft;
+    div.classList.add(styles.root);
+    div.classList.add(styles.hidden);
 
-    self.style.width = mediaElement.offsetWidth;
-    self.style.height = mediaElement.offsetHeight;
+    div.style.top = `${mediaElement.offsetTop}px`;
+    div.style.left = `${mediaElement.offsetLeft}px`;
 
-    Object.assign(self, {
-      hide: this.hide.bind(self),
-      show: this.show.bind(self),
-    });
+    div.style.width = `${mediaElement.offsetWidth}px`;
+    div.style.height = `${mediaElement.offsetHeight}px`;
 
-    return self;
+    this.div = div;
   }
 
   hide() {
-    if (this.classList.contains(styles.hidden)) {
+    if (this.div.classList.contains(styles.hidden)) {
       return;
     }
 
-    this.classList.add(styles.hidden);
+    this.div.classList.add(styles.hidden);
   }
 
   show() {
-    if (this.classList.contains(styles.hidden)) {
-      this.classList.remove(styles.hidden);
+    if (this.div.classList.contains(styles.hidden)) {
+      this.div.classList.remove(styles.hidden);
     }
+  }
+
+  render() {
+    return this.div;
   }
 }
 
-function insertAfter(newNode, referenceNode) {
+window.Root = Root;
+
+function insertAfter(newNode: Node, referenceNode: Node) {
+  if (!referenceNode.parentNode) {
+    throw Error('`referenceNode.parentNode` is null or undefined');
+  }
+
   referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
 
@@ -59,18 +66,19 @@ function setAllMediaElements() {
 function mountAllRecorders() {
   allMediaElements.forEach(mediaElement => {
     const root = new Root(mediaElement);
+    const rootNode = root.render();
 
-    insertAfter(root, mediaElement);
-    ReactDOM.render(<App mediaElement={mediaElement} />, root);
+    insertAfter(rootNode, mediaElement);
+    ReactDOM.render(<App mediaElement={mediaElement} />, rootNode);
 
     mediaElement.onmouseenter = () => {
       root.show();
     };
 
-    mediaElement.onmouseleave = root.onmouseleave = e => {
-      // hide `root` if `toElement` is not a decendent of `root`
+    mediaElement.onmouseleave = rootNode.onmouseleave = e => {
+      // hide `rootNode` if `toElement` is not a decendent of `rootNode`
 
-      if (root.contains(e.toElement)) {
+      if (rootNode.contains(e.toElement)) {
         return;
       }
 

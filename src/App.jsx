@@ -3,11 +3,22 @@
 import React, { Component } from 'react';
 import styles from './App.css';
 
-class App extends Component {
-  constructor(props) {
-    super();
+import { MediaRecorder } from './types';
 
-    this.blobs = [];
+type Props = {
+  mediaElement: HTMLMediaElement,
+};
+
+type State = {
+  mediaElement: HTMLMediaElement,
+  recorder: MediaRecorder | null,
+};
+
+class App extends Component<Props, State> {
+  blobs: Array<Blob> = [];
+
+  constructor(props: Props) {
+    super();
 
     this.state = {
       mediaElement: props.mediaElement,
@@ -21,7 +32,7 @@ class App extends Component {
     const { mediaElement } = this.state;
 
     const mediaStream = mediaElement.captureStream();
-    const recorder = new MediaRecorder(mediaStream, {
+    const recorder: MediaRecorder = new MediaRecorder(mediaStream, {
       mimeType: 'video/webm;codecs=H264',
     });
 
@@ -45,6 +56,11 @@ class App extends Component {
   };
 
   stopRecording = () => {
+    if (!this.state.recorder) {
+      // type check for flow
+      return;
+    }
+
     if (this.state.recorder.state === 'inactive') {
       return;
     }
@@ -65,7 +81,9 @@ class App extends Component {
     link.href = downloadUrl;
     link.download = '*.webm';
 
-    document.body.appendChild(link);
+    if (document.body) {
+      document.body.appendChild(link);
+    }
 
     link.click();
 

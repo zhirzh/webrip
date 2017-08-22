@@ -1,0 +1,17 @@
+[ignore]
+.*/package.json
+.*/package-lock.json
+
+.*/build/
+.*/config/
+.*/node_modules/
+.*/public/
+.*/scripts/
+
+[include]
+
+[libs]
+
+[options]
+
+[lints]
