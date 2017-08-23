@@ -16,8 +16,8 @@ function polyfill(audioElement) {
   };
 }
 
-function polyfillAudioElement(audioElement) {
-  if (audioElement.captureStream === undefined) {
+function polyfillAudioElement(audioElement, force = false) {
+  if (force || audioElement.captureStream === undefined) {
     audioElement.captureStream = polyfill(audioElement);
   }
 

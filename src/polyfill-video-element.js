@@ -40,8 +40,8 @@ function polyfill(videoElement) {
   };
 }
 
-function polyfillVideoElement(videoElement) {
-  if (videoElement.captureStream === undefined) {
+function polyfillVideoElement(videoElement, force = false) {
+  if (force || videoElement.captureStream === undefined) {
     videoElement.captureStream = polyfill(videoElement);
   }
 
