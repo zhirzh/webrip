@@ -21,10 +21,12 @@ class Root {
     div.classList.add(styles.root);
     div.classList.add(styles.hidden);
 
-    div.style.top = `${mediaElement.offsetTop}px`;
-    div.style.left = `${mediaElement.offsetLeft}px`;
-    div.style.width = `${mediaElement.offsetWidth}px`;
-    div.style.height = `${mediaElement.offsetHeight}px`;
+    const rect = mediaElement.getBoundingClientRect();
+
+    div.style.top = `${rect.top}px`;
+    div.style.left = `${rect.left}px`;
+    div.style.width = `${rect.width}px`;
+    div.style.height = `${rect.height}px`;
 
     this.div = div;
   }
@@ -63,36 +65,30 @@ function setAllMediaElements() {
     });
 }
 
-function hideRoot(root, toElement) {
-  // hide `rootNode` if `toElement` is not a decendent of `rootNode`
-
-  const rootNode = root.render();
-  if (rootNode.contains(toElement)) {
-    return;
-  }
-
-  root.hide();
-}
-
-function showRoot(root) {
-  root.show();
-}
-
 function mountRecorder(mediaElement: HTMLMediaElement) {
   const root = new Root(mediaElement);
   const rootNode = root.render();
 
   // $FlowFixMe - possibly null
-  mediaElement.parentElement.appendChild(rootNode);
+  document.body.appendChild(rootNode);
 
   // eslint-disable-next-line react/jsx-filename-extension
   ReactDOM.render(<App mediaElement={mediaElement} />, rootNode);
 
-  // $FlowFixMe - possibly null
-  mediaElement.parentElement.onmouseenter = () => showRoot(root);
+  window.addEventListener('mousemove', (e) => {
+    const rect = mediaElement.getBoundingClientRect();
 
-  // $FlowFixMe - possibly null
-  mediaElement.parentElement.onmouseleave = e => hideRoot(root, e.toElement);
+    const isBoundedX = e.pageX > rect.left && e.pageX < rect.left + rect.width;
+    const isBoundedY = e.pageY > rect.top && e.pageY < rect.top + rect.height;
+
+    const isBounded = isBoundedX && isBoundedY;
+
+    if (isBounded) {
+      root.show();
+    } else {
+      root.hide();
+    }
+  });
 }
 
 (function main() {
