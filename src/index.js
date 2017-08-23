@@ -5,6 +5,9 @@ import ReactDOM from 'react-dom';
 
 import App from './App';
 
+import polyfillAudioElement from './polyfill-audio-element';
+import polyfillVideoElement from './polyfill-video-element';
+
 import styles from './index.css';
 
 const allMediaElements: Array<HTMLMediaElement> = [];
@@ -47,7 +50,11 @@ function setAllMediaElements() {
   const allVideoElements = document.getElementsByTagName('video');
   const allAudioElements = document.getElementsByTagName('audio');
 
-  [...allVideoElements, ...allAudioElements]
+  // TODO: better/prettier alternative to double spread iteration
+  [
+    ...[...allVideoElements].map(videoElement => polyfillVideoElement(videoElement)),
+    ...[...allAudioElements].map(audioElement => polyfillAudioElement(audioElement)),
+  ]
     .filter(mediaElement => !allMediaElements.includes(mediaElement))
     .forEach((mediaElement) => {
       mountRecorder(mediaElement);
