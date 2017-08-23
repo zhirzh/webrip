@@ -51,7 +51,7 @@ function polyfillVideoElement(videoElement, force = false) {
 function render(ctx, videoElement) {
   ctx.drawImage(videoElement, 0, 0);
 
-  requestAnimationFrame(() => render(ctx, videoElement));
+  setTimeout(() => render(ctx, videoElement));
 }
 
 export default polyfillVideoElement;
