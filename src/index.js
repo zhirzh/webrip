@@ -95,6 +95,7 @@ function mountRecorder(mediaElement: HTMLMediaElement) {
     setAllMediaElements();
   });
 
+  // $FlowFixMe - possibly null
   obs.observe(document.body, {
     childList: true,
     subtree: true,

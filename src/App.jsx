@@ -4,6 +4,8 @@ import React, { Component } from 'react';
 
 import styles from './App.css';
 
+import type { MediaState } from './types';
+
 import { MediaRecorder } from './types';
 
 type Props = {
@@ -12,43 +14,90 @@ type Props = {
 
 type State = {
   mediaElement: HTMLMediaElement,
-  recorder: MediaRecorder | null,
+  recorder: MediaRecorder,
+  mediaState: MediaState,
 };
 
 class App extends Component<Props, State> {
   blobs: Array<Blob> = [];
+  monitorId: number;
 
   constructor(props: Props) {
     super();
 
-    this.state = {
-      mediaElement: props.mediaElement,
-      recorder: null,
-    };
-  }
-
-  startRecording = async () => {
-    this.blobs = [];
-
-    const { mediaElement } = this.state;
+    const { mediaElement } = props;
 
     // $FlowFixMe - flow v0.53.1 doesn't support `captureStream()`
     const mediaStream = mediaElement.captureStream();
-    const recorder: MediaRecorder = new MediaRecorder(mediaStream, {
-      mimeType: 'video/webm;codecs=H264',
-    });
+    const recorder = new MediaRecorder(mediaStream);
 
-    mediaElement.onplay = () => {
-      recorder.ondataavailable = (e) => {
-        this.blobs.push(e.data);
-
-        if (mediaElement.currentTime > mediaElement.duration) {
-          this.stopRecording();
-        }
-      };
+    this.state = {
+      mediaElement,
+      recorder,
+      mediaState: null,
     };
+  }
 
-    mediaElement.onended = this.stopRecording;
+  componentDidMount() {
+    this.state.recorder.ondataavailable = ({ data }) => {
+      this.blobs.push(data);
+    };
+  }
+
+  componentWillUnmount() {
+    const { mediaElement } = this.state;
+
+    mediaElement.removeEventListener('ended', this.stopRecording);
+    mediaElement.removeEventListener('pause', this.pauseRecording);
+    mediaElement.removeEventListener('play', this.resumeRecording);
+
+    clearTimeout(this.monitorId);
+  }
+
+  monitorMediaElement = () => {
+    const { mediaState, mediaElement } = this.state;
+
+    switch (mediaState) {
+      case 'ENDED':
+      case 'PAUSED':
+        break;
+
+      case 'LOADING':
+        if (mediaElement.readyState >= 3) {
+          this.setState({ mediaState: 'PLAYING' });
+        }
+        break;
+
+      case 'PLAYING':
+        if (mediaElement.readyState < 3) {
+          this.setState({ mediaState: 'LOADING' });
+        }
+        break;
+
+      default:
+        console.error(mediaState);
+        throw Error('Impossible `mediaState`');
+    }
+
+    this.monitorId = setTimeout(this.monitorMediaElement, 0);
+  };
+
+  pauseRecording = () => {
+    this.state.recorder.pause();
+
+    this.setState({ mediaState: 'PAUSED' });
+  };
+
+  resumeRecording = () => {
+    this.state.recorder.resume();
+
+    this.setState({ mediaState: 'PLAYING' });
+  };
+
+  startRecording = async () => {
+    const { mediaElement, recorder } = this.state;
+
+    this.blobs = [];
 
     mediaElement.pause();
     mediaElement.currentTime = 0;
@@ -56,23 +105,24 @@ class App extends Component<Props, State> {
     await mediaElement.play();
     recorder.start(10);
 
-    this.setState({ recorder });
+    mediaElement.addEventListener('ended', this.stopRecording);
+    mediaElement.addEventListener('pause', this.pauseRecording);
+    mediaElement.addEventListener('play', this.resumeRecording);
+
+    this.setState({ mediaState: 'PLAYING' }, this.monitorMediaElement);
   };
 
   stopRecording = () => {
-    if (!this.state.recorder) {
-      // type check for flow
-      return;
-    }
+    const { mediaElement, recorder } = this.state;
 
-    if (this.state.recorder.state === 'inactive') {
-      return;
-    }
+    mediaElement.removeEventListener('ended', this.stopRecording);
+    mediaElement.removeEventListener('pause', this.pauseRecording);
+    mediaElement.removeEventListener('play', this.resumeRecording);
 
-    this.state.recorder.stop();
-    this.state.mediaElement.pause();
+    recorder.stop();
+    mediaElement.pause();
 
-    this.setState({ recorder: null });
+    this.setState({ mediaState: 'ENDED' });
   };
 
   promptDownload = () => {
@@ -97,18 +147,45 @@ class App extends Component<Props, State> {
   renderRecorderButtons() {
     const { recorder } = this.state;
 
-    if (recorder === null) {
-      return (
-        <button className={styles.record} onClick={this.startRecording}>
-          ⏺
-        </button>
-      );
-    }
+    switch (recorder.state) {
+      case 'inactive':
+        return (
+          <button
+            className={styles.startRecordingButton}
+            onClick={this.startRecording}
+            title="Start recording"
+          >
+            ⏺
+          </button>
+        );
 
-    if (recorder.state === 'recording') {
+      case 'paused':
+      case 'recording':
+        return (
+          <button
+            className={styles.stopRecordingButton}
+            onClick={this.stopRecording}
+            title="Stop recording"
+          >
+            ⏹
+          </button>
+        );
+
+      default:
+        console.error(recorder.state);
+        throw Error('Impossible `MediaRecorder().state`');
+    }
+  }
+
+  renderDownloadButton() {
+    if (this.state.mediaState === 'ENDED') {
       return (
-        <button className={styles.stop} onClick={this.stopRecording}>
-          ⏹
+        <button
+          className={styles.downloadButton}
+          onClick={this.promptDownload}
+          title="Download recorded media"
+        >
+          ⬇
         </button>
       );
     }
@@ -116,34 +193,21 @@ class App extends Component<Props, State> {
     return null;
   }
 
-  renderDownloadButton() {
-    if (this.blobs.length === 0) {
-      return null;
+  renderRecordingBlinker() {
+    if (this.state.recorder.state === 'recording') {
+      return <span className={styles.recordingBlinker}>⏺</span>;
     }
 
-    return (
-      <button className={styles.download} onClick={this.promptDownload}>
-        ⬇
-      </button>
-    );
-  }
-
-  renderRecordingStatus() {
-    const { recorder } = this.state;
-
-    if (recorder === null || recorder.state !== 'recording') {
-      return null;
-    }
-
-    return <span className={styles.recording}>⏺</span>;
+    return null;
   }
 
   render() {
+    console.log(this.state.mediaState);
     return (
       <div className={styles.root}>
         {this.renderRecorderButtons()}
         {this.renderDownloadButton()}
-        {this.renderRecordingStatus()}
+        {this.renderRecordingBlinker()}
       </div>
     );
   }

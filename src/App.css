@@ -41,24 +41,24 @@
   pointer-events: auto; /* disableed in root element for ReactDOM.render() */
 }
 
-.download {
+.downloadButton {
   composes: button;
 
   font-size: 20px;
   padding-top: 4px;
 }
 
-.record {
+.startRecordingButton {
   composes: button;
 
   color: crimson;
 }
 
-.stop {
+.stopRecordingButton {
   composes: button;
 }
 
-.recording {
+.recordingBlinker {
   position: absolute;
   right: 0;
 
