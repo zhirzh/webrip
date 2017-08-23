@@ -48,6 +48,8 @@ class App extends Component<Props, State> {
       };
     };
 
+    mediaElement.onended = this.stopRecording;
+
     mediaElement.pause();
     mediaElement.currentTime = 0;
 
