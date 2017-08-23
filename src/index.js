@@ -7,7 +7,7 @@ import App from './App';
 
 import styles from './index.css';
 
-let allMediaElements: Array<HTMLMediaElement> = [];
+const allMediaElements: Array<HTMLMediaElement> = [];
 
 class Root {
   div: HTMLDivElement;
@@ -43,19 +43,17 @@ class Root {
   render = () => this.div;
 }
 
-function insertAfter(newNode: Node, referenceNode: Node) {
-  if (!referenceNode.parentNode) {
-    throw Error('`referenceNode.parentNode` is null or undefined');
-  }
-
-  referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-}
-
 function setAllMediaElements() {
   const allVideoElements = document.getElementsByTagName('video');
   const allAudioElements = document.getElementsByTagName('audio');
 
-  allMediaElements = [...allVideoElements, ...allAudioElements];
+  [...allVideoElements, ...allAudioElements]
+    .filter(mediaElement => !allMediaElements.includes(mediaElement))
+    .forEach((mediaElement) => {
+      mountRecorder(mediaElement);
+
+      allMediaElements.push(mediaElement);
+    });
 }
 
 function hideRoot(root, toElement) {
@@ -73,30 +71,34 @@ function showRoot(root) {
   root.show();
 }
 
-function mountAllRecorders() {
-  allMediaElements.forEach((mediaElement) => {
-    const root = new Root(mediaElement);
-    const rootNode = root.render();
+function mountRecorder(mediaElement: HTMLMediaElement) {
+  const root = new Root(mediaElement);
+  const rootNode = root.render();
 
-    insertAfter(rootNode, mediaElement);
+  // $FlowFixMe - possibly null
+  mediaElement.parentElement.appendChild(rootNode);
 
-    // eslint-disable-next-line react/jsx-filename-extension
-    ReactDOM.render(<App mediaElement={mediaElement} />, rootNode);
+  // eslint-disable-next-line react/jsx-filename-extension
+  ReactDOM.render(<App mediaElement={mediaElement} />, rootNode);
 
-    // eslint-disable-next-line no-param-reassign
-    mediaElement.onmouseenter = () => showRoot(root);
+  // $FlowFixMe - possibly null
+  mediaElement.parentElement.onmouseenter = () => showRoot(root);
 
-    // eslint-disable-next-line no-param-reassign
-    mediaElement.onmouseleave = e => hideRoot(root, e.toElement);
-
-    rootNode.onmouseleave = e => hideRoot(root, e.toElement);
-  });
+  // $FlowFixMe - possibly null
+  mediaElement.parentElement.onmouseleave = e => hideRoot(root, e.toElement);
 }
 
 (function main() {
   setAllMediaElements();
 
-  mountAllRecorders();
+  const obs = new MutationObserver(() => {
+    setAllMediaElements();
+  });
+
+  obs.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
 }());
 
 /* pass media element count for bringing "in focus" */

@@ -96,6 +96,8 @@
     "extends": "airbnb",
     "parser": "babel-eslint",
     "rules": {
+      "no-param-reassign": ["error", {"props": false}],
+      "no-use-before-define": "off",
       "react/sort-comp": "off"
     }
   }
