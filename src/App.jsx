@@ -88,6 +88,25 @@ class App extends Component<Props, State> {
     this.setState({ mediaState: 'PAUSED' });
   };
 
+  promptDownload = () => {
+    const blob = new Blob(this.blobs);
+
+    const downloadUrl = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.style.display = 'none';
+    link.href = downloadUrl;
+    link.download = '*.webm';
+
+    if (document.body) {
+      document.body.appendChild(link);
+    }
+
+    link.click();
+
+    setTimeout(() => link.remove(), 1000);
+  };
+
   resumeRecording = () => {
     this.state.recorder.resume();
 
@@ -125,24 +144,13 @@ class App extends Component<Props, State> {
     this.setState({ mediaState: 'ENDED' });
   };
 
-  promptDownload = () => {
-    const blob = new Blob(this.blobs);
-
-    const downloadUrl = window.URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.style.display = 'none';
-    link.href = downloadUrl;
-    link.download = '*.webm';
-
-    if (document.body) {
-      document.body.appendChild(link);
+  renderRecordingBlinker() {
+    if (this.state.recorder.state === 'recording') {
+      return <span className={styles.recordingBlinker}>⏺</span>;
     }
 
-    link.click();
-
-    setTimeout(() => link.remove(), 1000);
-  };
+    return null;
+  }
 
   renderRecorderButtons() {
     const { recorder } = this.state;
@@ -188,14 +196,6 @@ class App extends Component<Props, State> {
           ⬇
         </button>
       );
-    }
-
-    return null;
-  }
-
-  renderRecordingBlinker() {
-    if (this.state.recorder.state === 'recording') {
-      return <span className={styles.recordingBlinker}>⏺</span>;
     }
 
     return null;
