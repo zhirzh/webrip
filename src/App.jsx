@@ -88,9 +88,7 @@ class App extends Component<Props, State> {
     this.setState({ mediaState: 'PAUSED' });
   };
 
-  promptDownload = (e) => {
-    e.stopPropagation();
-
+  promptDownload = () => {
     const blob = new Blob(this.blobs);
 
     const downloadUrl = window.URL.createObjectURL(blob);
@@ -115,9 +113,7 @@ class App extends Component<Props, State> {
     this.setState({ mediaState: 'PLAYING' });
   };
 
-  startRecording = async (e) => {
-    e.stopPropagation();
-
+  startRecording = async () => {
     const { mediaElement, recorder } = this.state;
 
     this.blobs = [];
@@ -135,9 +131,7 @@ class App extends Component<Props, State> {
     this.setState({ mediaState: 'PLAYING' }, this.monitorMediaElement);
   };
 
-  stopRecording = (e) => {
-    e.stopPropagation();
-
+  stopRecording = () => {
     const { mediaElement, recorder } = this.state;
 
     mediaElement.removeEventListener('ended', this.stopRecording);
@@ -207,9 +201,11 @@ class App extends Component<Props, State> {
     return null;
   }
 
+  stopPropagation = (e: MouseEvent) => e.stopPropagation();
+
   render() {
     return (
-      <div className={styles.root}>
+      <div className={styles.root} onClick={this.stopPropagation}>
         {this.renderRecorderButtons()}
         {this.renderDownloadButton()}
         {this.renderRecordingBlinker()}

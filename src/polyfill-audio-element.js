@@ -1,3 +1,7 @@
+// @flow
+
+import { AudioContext } from './types';
+
 function polyfill(audioElement) {
   // `audioElement` must NOT be muted
 
@@ -16,8 +20,9 @@ function polyfill(audioElement) {
   };
 }
 
-function polyfillAudioElement(audioElement, force = false) {
+function polyfillAudioElement(audioElement: HTMLMediaElement, force: boolean = false) {
   if (force || audioElement.captureStream === undefined) {
+    // $FlowFixMe - flow v0.53.1 doesn't support `captureStream()`
     audioElement.captureStream = polyfill(audioElement);
   }
 

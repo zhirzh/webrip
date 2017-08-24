@@ -1,14 +1,17 @@
+// @flow
+
 import polyfillAudioElement from './polyfill-audio-element';
 
 function captureAudioStream(videoElement) {
   polyfillAudioElement(videoElement);
 
-  // eslint-disable-next-line no-underscore-dangle
-  const _captureStream = videoElement.captureStream.bind(videoElement);
+  // $FlowFixMe - flow v0.53.1 doesn't support `captureStream()`
+  const captureStream = videoElement.captureStream;
 
+  // $FlowFixMe - flow v0.53.1 doesn't support `captureStream()`
   videoElement.captureStream = undefined;
 
-  const audioStream = _captureStream();
+  const audioStream = captureStream();
 
   return audioStream;
 }
@@ -25,6 +28,7 @@ function captureVideoStream(videoElement) {
 
   render(ctx, videoElement);
 
+  // $FlowFixMe - flow v0.53.1 doesn't support `captureStream()`
   return canvas.captureStream();
 }
 
@@ -40,8 +44,9 @@ function polyfill(videoElement) {
   };
 }
 
-function polyfillVideoElement(videoElement, force = false) {
+function polyfillVideoElement(videoElement: HTMLVideoElement, force: boolean = false) {
   if (force || videoElement.captureStream === undefined) {
+    // $FlowFixMe - flow v0.53.1 doesn't support `captureStream()`
     videoElement.captureStream = polyfill(videoElement);
   }
 
