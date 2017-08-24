@@ -29,7 +29,7 @@ function captureVideoStream(videoElement) {
   render(ctx, videoElement);
 
   // $FlowFixMe - flow v0.53.1 doesn't support `captureStream()`
-  return canvas.captureStream();
+  return canvas.captureStream(60);
 }
 
 function polyfill(videoElement) {
