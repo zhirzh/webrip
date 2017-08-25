@@ -22,3 +22,5 @@ yarn-error.log*
 
 test/*
 !test/test.html
+
+*.zip

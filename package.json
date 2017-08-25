@@ -1,7 +1,6 @@
 {
   "name": "webrip",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
   "dependencies": {
     "autoprefixer": "7.1.2",
     "babel-core": "6.25.0",
@@ -47,10 +46,14 @@
     "whatwg-fetch": "2.0.3"
   },
   "scripts": {
+    "build": "npm run copy-public && npm run build:cra",
+    "build:chrome": "npm run build && npm run zip",
+    "build:cra": "node scripts/build.js",
+    "copy-public": "node copy-public.js",
     "start": "NODE_ENV=development webpack -w --config config/webpack.config.dev.js",
-    "server": "node scripts/start.js",
-    "build": "node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom"
+    "start:cra": "node scripts/start.js",
+    "test": "node scripts/test.js --env=jsdom",
+    "zip": "rm webrip.zip; cd build && zip ../webrip.zip -r *"
   },
   "jest": {
     "collectCoverageFrom": [
