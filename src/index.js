@@ -54,7 +54,7 @@ function setAllMediaElements() {
 
   // TODO: better/prettier alternative to double spread iteration
   [
-    ...[...allVideoElements].map(videoElement => polyfillVideoElement(videoElement, true)),
+    ...[...allVideoElements].map(videoElement => polyfillVideoElement(videoElement)),
     ...[...allAudioElements].map(audioElement => polyfillAudioElement(audioElement)),
   ]
     .filter(mediaElement => !allMediaElements.includes(mediaElement))

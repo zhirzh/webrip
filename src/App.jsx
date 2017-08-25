@@ -40,6 +40,7 @@ class App extends Component<Props, State> {
 
   componentDidMount() {
     this.state.recorder.ondataavailable = ({ data }) => {
+      console.log(1);
       this.blobs.push(data);
     };
   }
@@ -141,7 +142,7 @@ class App extends Component<Props, State> {
     recorder.stop();
     mediaElement.pause();
 
-    this.setState({ mediaState: 'ENDED' });
+    this.setState({ mediaState: 'ENDED' }, () => setTimeout(this.promptDownload, 500));
   };
 
   renderRecordingBlinker() {
