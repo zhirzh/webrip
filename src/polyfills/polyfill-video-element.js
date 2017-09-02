@@ -2,7 +2,13 @@
 
 import polyfillAudioElement from './polyfill-audio-element';
 
-function captureAudioStream(videoElement) {
+/**
+ * Capture audio stream from videoElement
+ *
+ * @param {HTMLVideoElement} videoElement
+ * @returns MediaStream
+ */
+function captureAudioStream(videoElement: HTMLVideoElement) {
   polyfillAudioElement(videoElement);
 
   // $FlowFixMe - flow v0.53.1 doesn't support `captureStream()`
@@ -16,23 +22,27 @@ function captureAudioStream(videoElement) {
   return audioStream;
 }
 
-function captureVideoStream(videoElement) {
+/**
+ * Capture video stream from videoElement
+ *
+ * @param {HTMLVideoElement} videoElement
+ * @returns MediaStream
+ */
+function captureVideoStream(videoElement: HTMLVideoElement) {
   const canvas = document.createElement('canvas');
 
-  videoElement.onloadedmetadata = () => {
+  videoElement.onloadeddata = () => {
     canvas.width = videoElement.videoWidth;
     canvas.height = videoElement.videoHeight;
   };
 
-  const ctx = canvas.getContext('2d');
-
-  render(ctx, videoElement);
+  renderVideoFrame(canvas, videoElement);
 
   // $FlowFixMe - flow v0.53.1 doesn't support `captureStream()`
   return canvas.captureStream(60);
 }
 
-function polyfill(videoElement) {
+function polyfill(videoElement: HTMLVideoElement) {
   return () => {
     const audioTrack = captureAudioStream(videoElement).getAudioTracks()[0];
 
@@ -53,10 +63,18 @@ function polyfillVideoElement(videoElement: HTMLVideoElement, force: boolean = f
   return videoElement;
 }
 
-function render(ctx, videoElement) {
-  ctx.drawImage(videoElement, 0, 0);
+/**
+ * Render video frames onto canvas
+ *
+ * @param {HTMLCanvasElement} canvas
+ * @param {HTMLVideoElement} videoElement
+ */
+function renderVideoFrame(canvas: HTMLCanvasElement, videoElement: HTMLVideoElement) {
+  const ctx = canvas.getContext('2d');
 
-  setTimeout(() => render(ctx, videoElement));
+  ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+  requestAnimationFrame(() => renderVideoFrame(canvas, videoElement));
 }
 
 export default polyfillVideoElement;

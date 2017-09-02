@@ -3,10 +3,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import App from './App';
+import Recorder from './Recorder';
 
-import polyfillAudioElement from './polyfill-audio-element';
-import polyfillVideoElement from './polyfill-video-element';
+import polyfillAudioElement from './polyfills/polyfill-audio-element';
+import polyfillVideoElement from './polyfills/polyfill-video-element';
 
 import styles from './index.css';
 
@@ -73,7 +73,7 @@ function mountRecorder(mediaElement: HTMLMediaElement) {
   document.body.appendChild(rootNode);
 
   // eslint-disable-next-line react/jsx-filename-extension
-  ReactDOM.render(<App mediaElement={mediaElement} />, rootNode);
+  ReactDOM.render(<Recorder mediaElement={mediaElement} />, rootNode);
 
   window.addEventListener('mousemove', (e) => {
     const rect = mediaElement.getBoundingClientRect();

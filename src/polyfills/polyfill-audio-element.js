@@ -1,8 +1,8 @@
 // @flow
 
-import { AudioContext } from './types';
+import { AudioContext } from '../types';
 
-function polyfill(audioElement) {
+function polyfill(audioElement: HTMLMediaElement) {
   // `audioElement` must NOT be muted
 
   return () => {

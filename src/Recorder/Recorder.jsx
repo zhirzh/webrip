@@ -2,11 +2,11 @@
 
 import React, { Component } from 'react';
 
-import styles from './App.css';
+import styles from './Recorder.css';
 
-import type { MediaState } from './types';
+import type { MediaState } from '../types';
 
-import { MediaRecorder } from './types';
+import { MediaRecorder } from '../types';
 
 type Props = {
   mediaElement: HTMLMediaElement,
@@ -18,7 +18,7 @@ type State = {
   mediaState: MediaState,
 };
 
-class App extends Component<Props, State> {
+class Recorder extends Component<Props, State> {
   blobs: Array<Blob> = [];
   monitorId: number;
 
@@ -40,7 +40,6 @@ class App extends Component<Props, State> {
 
   componentDidMount() {
     this.state.recorder.ondataavailable = ({ data }) => {
-      console.log(1);
       this.blobs.push(data);
     };
   }
@@ -205,6 +204,8 @@ class App extends Component<Props, State> {
   stopPropagation = (e: MouseEvent) => e.stopPropagation();
 
   render() {
+    console.log(this.state.mediaState);
+
     return (
       <div className={styles.root} onClick={this.stopPropagation}>
         {this.renderRecorderButtons()}
@@ -215,4 +216,4 @@ class App extends Component<Props, State> {
   }
 }
 
-export default App;
+export default Recorder;
