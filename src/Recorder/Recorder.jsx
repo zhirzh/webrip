@@ -18,10 +18,15 @@ type State = {
   mediaState: MediaState,
 };
 
-class Recorder extends Component<Props, State> {
-  blobs: Array<Blob> = [];
-  monitorId: number;
+const MEDIA_STATES = {
+  ended: 'ended',
+  loading: 'loading',
+  paused: 'paused',
+  playing: 'playing',
+  started: 'started',
+};
 
+class Recorder extends Component<Props, State> {
   constructor(props: Props) {
     super();
 
@@ -44,33 +49,60 @@ class Recorder extends Component<Props, State> {
     };
   }
 
+  componentWillUpdate(_, nextState) {
+    const { mediaState, recorder } = nextState;
+
+    switch (mediaState) {
+      case MEDIA_STATES.ended:
+        recorder.stop();
+        clearTimeout(this.monitorId);
+        this.promptDownload();
+        break;
+
+      case MEDIA_STATES.loading:
+      case MEDIA_STATES.paused:
+        recorder.pause();
+        break;
+
+      case MEDIA_STATES.playing:
+        recorder.resume();
+        break;
+
+      case MEDIA_STATES.started:
+        break;
+
+      default:
+        console.error(mediaState);
+        throw Error('Impossible `mediaState`');
+    }
+  }
+
   componentWillUnmount() {
     const { mediaElement } = this.state;
 
     mediaElement.removeEventListener('ended', this.stopRecording);
     mediaElement.removeEventListener('pause', this.pauseRecording);
-    mediaElement.removeEventListener('play', this.resumeRecording);
+    mediaElement.removeEventListener('playing', this.resumeRecording);
 
     clearTimeout(this.monitorId);
   }
+
+  blobs: Array<Blob> = [];
+  monitorId: number;
 
   monitorMediaElement = () => {
     const { mediaState, mediaElement } = this.state;
 
     switch (mediaState) {
-      case 'ENDED':
-      case 'PAUSED':
+      case MEDIA_STATES.ended:
+      case MEDIA_STATES.loading:
+      case MEDIA_STATES.paused:
         break;
 
-      case 'LOADING':
-        if (mediaElement.readyState >= 3) {
-          this.setState({ mediaState: 'PLAYING' });
-        }
-        break;
-
-      case 'PLAYING':
+      case MEDIA_STATES.playing:
+      case MEDIA_STATES.started:
         if (mediaElement.readyState < 3) {
-          this.setState({ mediaState: 'LOADING' });
+          this.updateMediaState(MEDIA_STATES.loading);
         }
         break;
 
@@ -82,11 +114,7 @@ class Recorder extends Component<Props, State> {
     this.monitorId = setTimeout(this.monitorMediaElement, 0);
   };
 
-  pauseRecording = () => {
-    this.state.recorder.pause();
-
-    this.setState({ mediaState: 'PAUSED' });
-  };
+  pauseRecording = () => this.updateMediaState(MEDIA_STATES.paused);
 
   promptDownload = () => {
     const blob = new Blob(this.blobs);
@@ -107,11 +135,7 @@ class Recorder extends Component<Props, State> {
     setTimeout(() => link.remove(), 1000);
   };
 
-  resumeRecording = () => {
-    this.state.recorder.resume();
-
-    this.setState({ mediaState: 'PLAYING' });
-  };
+  resumeRecording = () => this.updateMediaState(MEDIA_STATES.playing);
 
   startRecording = async () => {
     const { mediaElement, recorder } = this.state;
@@ -126,27 +150,40 @@ class Recorder extends Component<Props, State> {
 
     mediaElement.addEventListener('ended', this.stopRecording);
     mediaElement.addEventListener('pause', this.pauseRecording);
-    mediaElement.addEventListener('play', this.resumeRecording);
+    mediaElement.addEventListener('playing', this.resumeRecording);
 
-    this.setState({ mediaState: 'PLAYING' }, this.monitorMediaElement);
+    this.updateMediaState(MEDIA_STATES.started, this.monitorMediaElement);
   };
 
+  stopPropagation = (e: MouseEvent) => e.stopPropagation();
+
   stopRecording = () => {
-    const { mediaElement, recorder } = this.state;
+    const { mediaElement } = this.state;
 
     mediaElement.removeEventListener('ended', this.stopRecording);
     mediaElement.removeEventListener('pause', this.pauseRecording);
-    mediaElement.removeEventListener('play', this.resumeRecording);
+    mediaElement.removeEventListener('playing', this.resumeRecording);
 
-    recorder.stop();
     mediaElement.pause();
 
-    this.setState({ mediaState: 'ENDED' }, () => setTimeout(this.promptDownload, 500));
+    this.updateMediaState(MEDIA_STATES.ended);
   };
 
-  renderRecordingBlinker() {
-    if (this.state.recorder.state === 'recording') {
-      return <span className={styles.recordingBlinker}>⏺</span>;
+  updateMediaState = (mediaState, cb = null) => {
+    this.setState({ mediaState }, cb);
+  };
+
+  renderDownloadButton() {
+    if (this.state.mediaState === MEDIA_STATES.ended) {
+      return (
+        <button
+          className={styles.downloadButton}
+          onClick={this.promptDownload}
+          title="Download recorded media"
+        >
+          ⬇
+        </button>
+      );
     }
 
     return null;
@@ -185,27 +222,15 @@ class Recorder extends Component<Props, State> {
     }
   }
 
-  renderDownloadButton() {
-    if (this.state.mediaState === 'ENDED') {
-      return (
-        <button
-          className={styles.downloadButton}
-          onClick={this.promptDownload}
-          title="Download recorded media"
-        >
-          ⬇
-        </button>
-      );
+  renderRecordingBlinker() {
+    if (this.state.recorder.state === 'recording') {
+      return <span className={styles.recordingBlinker}>⏺</span>;
     }
 
     return null;
   }
 
-  stopPropagation = (e: MouseEvent) => e.stopPropagation();
-
   render() {
-    console.log(this.state.mediaState);
-
     return (
       <div className={styles.root} onClick={this.stopPropagation}>
         {this.renderRecorderButtons()}
