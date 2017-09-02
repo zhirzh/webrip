@@ -10,13 +10,13 @@ import polyfillVideoElement from './polyfills/polyfill-video-element';
 
 import styles from './index.css';
 
-const allMediaElements: Array<HTMLMediaElement> = [];
+const allMediaElements = [];
 
 class Root {
   div: HTMLDivElement;
 
-  constructor(mediaElement: HTMLMediaElement) {
-    const div = (document.createElement('div'): any);
+  constructor(mediaElement) {
+    const div = document.createElement('div');
 
     div.classList.add(styles.root);
     div.classList.add(styles.hidden);
@@ -65,7 +65,7 @@ function setAllMediaElements() {
     });
 }
 
-function mountRecorder(mediaElement: HTMLMediaElement) {
+function mountRecorder(mediaElement) {
   const root = new Root(mediaElement);
   const rootNode = root.render();
 

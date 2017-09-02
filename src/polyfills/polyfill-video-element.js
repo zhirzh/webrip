@@ -8,7 +8,7 @@ import polyfillAudioElement from './polyfill-audio-element';
  * @param {HTMLVideoElement} videoElement
  * @returns MediaStream
  */
-function captureAudioStream(videoElement: HTMLVideoElement) {
+function captureAudioStream(videoElement) {
   polyfillAudioElement(videoElement);
 
   // $FlowFixMe - flow v0.53.1 doesn't support `captureStream()`
@@ -28,7 +28,7 @@ function captureAudioStream(videoElement: HTMLVideoElement) {
  * @param {HTMLVideoElement} videoElement
  * @returns MediaStream
  */
-function captureVideoStream(videoElement: HTMLVideoElement) {
+function captureVideoStream(videoElement) {
   const canvas = document.createElement('canvas');
 
   videoElement.onloadeddata = () => {
@@ -42,7 +42,7 @@ function captureVideoStream(videoElement: HTMLVideoElement) {
   return canvas.captureStream(60);
 }
 
-function polyfill(videoElement: HTMLVideoElement) {
+function polyfill(videoElement) {
   return () => {
     const audioTrack = captureAudioStream(videoElement).getAudioTracks()[0];
 
@@ -54,7 +54,7 @@ function polyfill(videoElement: HTMLVideoElement) {
   };
 }
 
-function polyfillVideoElement(videoElement: HTMLVideoElement, force: boolean = false) {
+function polyfillVideoElement(videoElement: HTMLVideoElement, force?: boolean = false) {
   if (force || videoElement.captureStream === undefined) {
     // $FlowFixMe - flow v0.53.1 doesn't support `captureStream()`
     videoElement.captureStream = polyfill(videoElement);
@@ -69,7 +69,7 @@ function polyfillVideoElement(videoElement: HTMLVideoElement, force: boolean = f
  * @param {HTMLCanvasElement} canvas
  * @param {HTMLVideoElement} videoElement
  */
-function renderVideoFrame(canvas: HTMLCanvasElement, videoElement: HTMLVideoElement) {
+function renderVideoFrame(canvas, videoElement) {
   const ctx = canvas.getContext('2d');
 
   ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);

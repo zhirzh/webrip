@@ -2,20 +2,20 @@
 
 import React, { Component } from 'react';
 
-import styles from './Recorder.css';
-
-import type { MediaState } from '../types';
-
 import { MediaRecorder } from '../types';
 
-type Props = {
-  mediaElement: HTMLMediaElement,
-};
+import styles from './Recorder.css';
+
+type MediaState = null | $Keys<typeof MEDIA_STATES>;
 
 type State = {
   mediaElement: HTMLMediaElement,
   recorder: MediaRecorder,
   mediaState: MediaState,
+};
+
+type Props = {
+  mediaElement: HTMLMediaElement,
 };
 
 const MEDIA_STATES = {
@@ -49,7 +49,7 @@ class Recorder extends Component<Props, State> {
     };
   }
 
-  componentWillUpdate(_, nextState) {
+  componentWillUpdate(_: any, nextState: State) {
     const { mediaState, recorder } = nextState;
 
     switch (mediaState) {
@@ -87,8 +87,8 @@ class Recorder extends Component<Props, State> {
     clearTimeout(this.monitorId);
   }
 
-  blobs: Array<Blob> = [];
-  monitorId: number;
+  blobs = [];
+  monitorId = 0;
 
   monitorMediaElement = () => {
     const { mediaState, mediaElement } = this.state;
@@ -169,7 +169,7 @@ class Recorder extends Component<Props, State> {
     this.updateMediaState(MEDIA_STATES.ended);
   };
 
-  updateMediaState = (mediaState, cb = null) => {
+  updateMediaState = (mediaState: MediaState, cb?: Function) => {
     this.setState({ mediaState }, cb);
   };
 
