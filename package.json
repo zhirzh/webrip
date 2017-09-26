@@ -43,7 +43,8 @@
     "webpack": "3.5.1",
     "webpack-dev-server": "2.7.1",
     "webpack-manifest-plugin": "1.2.1",
-    "whatwg-fetch": "2.0.3"
+    "whatwg-fetch": "2.0.3",
+    "snyk": "^1.41.1"
   },
   "scripts": {
     "build": "npm run copy-public && npm run build:cra",
@@ -53,7 +54,9 @@
     "start": "NODE_ENV=development webpack -w --config config/webpack.config.dev.js",
     "start:cra": "node scripts/start.js",
     "test": "node scripts/test.js --env=jsdom",
-    "zip": "rm webrip.zip; cd build && zip ../webrip.zip -r *"
+    "zip": "rm webrip.zip; cd build && zip ../webrip.zip -r *",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "jest": {
     "collectCoverageFrom": [
@@ -110,5 +113,6 @@
       "no-use-before-define": "off",
       "react/sort-comp": "off"
     }
-  }
+  },
+  "snyk": true
 }
