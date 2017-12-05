@@ -1,0 +1,66 @@
+.recorder {
+  width: 100%;
+  margin: 10px;
+}
+
+.button {
+  float: left;
+
+  width: 26px;
+  height: 26px;
+
+  padding: 0;
+  padding-bottom: 2px;
+
+  background-color: #ddd;
+  border: 2px solid #888;
+  border-radius: 2px;
+
+  color: #222;
+  font-size: 24px;
+  line-height: 0;
+
+  pointer-events: auto; /* disableed in root element for ReactDOM.render() */
+}
+
+.button:focus,
+.button:hover {
+  outline: none;
+  box-shadow: 0 0 10px #777;
+}
+
+.download-button {
+  font-size: 20px;
+  padding-top: 4px;
+}
+
+.start-button {
+  color: crimson;
+}
+
+.stop-button {
+}
+
+.recording-indicator {
+  position: absolute;
+  right: 0;
+
+  color: crimson;
+  font-size: 20px;
+
+  animation-name: blink;
+  animation-duration: 1s;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in;
+}
+
+@keyframes blink {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
