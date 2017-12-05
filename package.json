@@ -54,9 +54,13 @@
     "whatwg-fetch": "2.0.3"
   },
   "scripts": {
-    "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom"
+    "build": "npm run copy-public && npm run build:app",
+    "build:app": "node scripts/build.js",
+    "chrome": "npm run build && npm run zip",
+    "copy-public": "node copy-public.js",
+    "start": "NODE_ENV=development webpack -w --config config/webpack.config.dev.js",
+    "start:app": "node scripts/start.js",
+    "zip": "rm webrip.zip; cd build && zip ../webrip.zip -r *"
   },
   "jest": {
     "collectCoverageFrom": [
