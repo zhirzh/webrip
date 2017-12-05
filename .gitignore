@@ -21,3 +21,6 @@ yarn-debug.log*
 yarn-error.log*
 
 webrip.zip
+
+test/*
+!test/test.html

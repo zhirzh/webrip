@@ -56,6 +56,8 @@ function setMediaElements() {
   setMediaElements();
 
   const mutObs = new MutationObserver(setMediaElements);
+
+  // $FlowFixMe - v0.60.1 does not treat `HTMLBodyElement` as `Node`
   mutObs.observe(document.body, {
     childList: true,
     subtree: true,
