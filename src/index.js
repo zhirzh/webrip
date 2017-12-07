@@ -8,7 +8,7 @@ import Root from './Root';
 
 import './index.css';
 
-let mediaElements = [];
+const mediaElements = [];
 
 function mountRecorder(mediaElement) {
   const root = new Root(mediaElement);
@@ -38,10 +38,7 @@ function setMediaElements() {
   const audioElements = document.getElementsByTagName('audio');
   const videoElements = document.getElementsByTagName('video');
 
-  const newMediaElements = [
-    ...audioElements,
-    ...videoElements,
-  ];
+  const newMediaElements = [...audioElements, ...videoElements];
 
   newMediaElements
     .filter(mediaElement => !mediaElements.includes(mediaElement))

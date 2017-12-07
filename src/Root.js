@@ -1,4 +1,5 @@
 // @flow
+/* eslint class-methods-use-this: ["error", { "exceptMethods": ["constructDiv"] }] */
 
 import './Root.css';
 
@@ -6,6 +7,10 @@ class Root {
   div: HTMLDivElement;
 
   constructor(mediaElement: HTMLMediaElement) {
+    this.div = this.constructDiv(mediaElement);
+  }
+
+  constructDiv(mediaElement) {
     const div = document.createElement('div');
 
     div.classList.add('root');
@@ -18,7 +23,7 @@ class Root {
     div.style.width = `${rect.width}px`;
     div.style.height = `${rect.height}px`;
 
-    this.div = div;
+    return div;
   }
 
   hide = () => {

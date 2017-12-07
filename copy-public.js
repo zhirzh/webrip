@@ -1,6 +1,6 @@
-const { resolve } = require('path');
 const { execSync } = require('child_process');
 const { existsSync, mkdirSync } = require('fs');
+const { resolve } = require('path');
 
 const PUBLIC_DIR = resolve(__dirname, 'public');
 const BUILD_DIR = resolve(__dirname, 'build');

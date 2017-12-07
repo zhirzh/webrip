@@ -35,26 +35,14 @@ class Recorder extends Component<Props, State> {
 
     const mediaStream = mediaElement.captureStream();
     const recorder = new MediaRecorder(mediaStream);
+    recorder.ondataavailable = ({ data }) => {
+      this.blobs.push(data);
+    };
 
     this.state = {
       mediaElement,
       recorder,
       mediaState: MEDIA_STATES.idle,
-    };
-
-    // Object.getOwnPropertyNames(this)
-    //   .filter(k => typeof this[k] === 'function')
-    //   .forEach(k => {
-    //     this[k] = (...args) => {
-    //       console.log(k)
-    //       this[k](...args);
-    //     }
-    //   })
-  }
-
-  componentDidMount() {
-    this.state.recorder.ondataavailable = ({ data }) => {
-      this.blobs.push(data);
     };
   }
 
@@ -81,7 +69,7 @@ class Recorder extends Component<Props, State> {
         break;
 
       default:
-        throw Error('Unknown `mediaState`: ' + mediaState);
+        throw Error(`Unknown \`mediaState\`: ${mediaState}`);
     }
   }
 
@@ -99,7 +87,8 @@ class Recorder extends Component<Props, State> {
   watchId = 0;
 
   /**
-   * Indefinitely watch `mediaElement` to check if it's "loading" content after it starts playing or resumes.
+   * Indefinitely watch `mediaElement` to check if it's "loading" content
+   * after it starts playing or resumes.
    */
   watchMediaElement = () => {
     const { mediaState, mediaElement } = this.state;
@@ -119,7 +108,7 @@ class Recorder extends Component<Props, State> {
         break;
 
       default:
-        throw Error('Unknown `mediaState`: ' + mediaState);
+        throw Error(`Unknown \`mediaState\`: ${mediaState}`);
     }
 
     // RAF maybe?
