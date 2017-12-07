@@ -14,6 +14,7 @@ function mountRecorder(mediaElement) {
   const root = new Root(mediaElement);
   const rootNode = root.render();
 
+  // $FlowFixMe
   document.body.appendChild(rootNode);
 
   ReactDOM.render(<Recorder mediaElement={mediaElement} />, rootNode);

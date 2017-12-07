@@ -10,7 +10,7 @@ class Root {
     this.div = this.constructDiv(mediaElement);
   }
 
-  constructDiv(mediaElement) {
+  constructDiv(mediaElement: HTMLMediaElement) {
     const div = document.createElement('div');
 
     div.classList.add('root');
