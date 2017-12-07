@@ -84,36 +84,6 @@ class Recorder extends Component<Props, State> {
   }
 
   blobs = [];
-  watchId = 0;
-
-  /**
-   * Indefinitely watch `mediaElement` to check if it's "loading" content
-   * after it starts playing or resumes.
-   */
-  watchMediaElement = () => {
-    const { mediaState, mediaElement } = this.state;
-
-    switch (mediaState) {
-      case MEDIA_STATES.ended:
-      case MEDIA_STATES.loading:
-      case MEDIA_STATES.paused:
-        // nothing to do
-        break;
-
-      case MEDIA_STATES.playing:
-      case MEDIA_STATES.started:
-        if (mediaElement.readyState < 3) {
-          this.updateMediaState(MEDIA_STATES.loading);
-        }
-        break;
-
-      default:
-        throw Error(`Unknown \`mediaState\`: ${mediaState}`);
-    }
-
-    // RAF maybe?
-    this.watchId = setTimeout(this.watchMediaElement, 0);
-  };
 
   pauseRecording = () => this.updateMediaState(MEDIA_STATES.paused);
 
@@ -172,6 +142,37 @@ class Recorder extends Component<Props, State> {
 
   updateMediaState = (mediaState: MediaState, cb?: Function) => {
     this.setState({ mediaState }, cb);
+  };
+
+  watchId = 0;
+
+  /**
+   * Indefinitely watch `mediaElement` to check if it's "loading" content
+   * after it starts playing or resumes.
+   */
+  watchMediaElement = () => {
+    const { mediaState, mediaElement } = this.state;
+
+    switch (mediaState) {
+      case MEDIA_STATES.ended:
+      case MEDIA_STATES.loading:
+      case MEDIA_STATES.paused:
+        // nothing to do
+        break;
+
+      case MEDIA_STATES.playing:
+      case MEDIA_STATES.started:
+        if (mediaElement.readyState < 3) {
+          this.updateMediaState(MEDIA_STATES.loading);
+        }
+        break;
+
+      default:
+        throw Error(`Unknown \`mediaState\`: ${mediaState}`);
+    }
+
+    // RAF maybe?
+    this.watchId = setTimeout(this.watchMediaElement, 0);
   };
 
   renderDownloadButton() {
