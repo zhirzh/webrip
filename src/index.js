@@ -6,6 +6,8 @@ import ReactDOM from 'react-dom';
 import Recorder from './Recorder';
 import Root from './Root';
 
+import polyfillAudioElement from './polyfills/polyfill-audio-element';
+
 import './index.css';
 
 const mediaElements = [];
@@ -36,7 +38,9 @@ function mountRecorder(mediaElement) {
 }
 
 function setMediaElements() {
-  const audioElements = document.getElementsByTagName('audio');
+  const audioElements = Array.from(document.getElementsByTagName('audio'), audioElement =>
+    polyfillAudioElement(audioElement, true));
+
   const videoElements = document.getElementsByTagName('video');
 
   const newMediaElements = [...audioElements, ...videoElements];
