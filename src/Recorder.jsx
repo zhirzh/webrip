@@ -9,8 +9,6 @@ import './Recorder.css';
 type MediaState = $Keys<typeof MEDIA_STATES>;
 
 type State = {
-  mediaElement: HTMLMediaElement,
-  recorder: MediaRecorder,
   mediaState: MediaState,
 };
 
@@ -28,6 +26,10 @@ const MEDIA_STATES = {
 };
 
 class Recorder extends Component<Props, State> {
+  blobs: Array<Blob>;
+  mediaElement: HTMLMediaElement;
+  recorder: MediaRecorder;
+
   constructor(props: Props) {
     super();
 
@@ -40,14 +42,16 @@ class Recorder extends Component<Props, State> {
     };
 
     this.state = {
-      mediaElement,
-      recorder,
       mediaState: MEDIA_STATES.idle,
     };
+
+    this.mediaElement = mediaElement;
+    this.recorder = recorder;
   }
 
   componentWillUpdate(nextProps: Props, nextState: State) {
-    const { mediaState, recorder } = nextState;
+    const { mediaState } = nextState;
+    const { recorder } = this;
 
     switch (mediaState) {
       case MEDIA_STATES.ended:
@@ -74,7 +78,7 @@ class Recorder extends Component<Props, State> {
   }
 
   componentWillUnmount() {
-    const { mediaElement } = this.state;
+    const { mediaElement } = this;
 
     mediaElement.removeEventListener('ended', this.stopRecording);
     mediaElement.removeEventListener('pause', this.pauseRecording);
@@ -82,8 +86,6 @@ class Recorder extends Component<Props, State> {
 
     clearTimeout(this.watchId);
   }
-
-  blobs = [];
 
   pauseRecording = () => this.updateMediaState(MEDIA_STATES.paused);
 
@@ -109,7 +111,7 @@ class Recorder extends Component<Props, State> {
   resumeRecording = () => this.updateMediaState(MEDIA_STATES.playing);
 
   startRecording = async () => {
-    const { mediaElement, recorder } = this.state;
+    const { mediaElement, recorder } = this;
 
     this.blobs = [];
 
@@ -129,7 +131,7 @@ class Recorder extends Component<Props, State> {
   stopPropagation = (e: MouseEvent) => e.stopPropagation();
 
   stopRecording = () => {
-    const { mediaElement } = this.state;
+    const { mediaElement } = this;
 
     mediaElement.removeEventListener('ended', this.stopRecording);
     mediaElement.removeEventListener('pause', this.pauseRecording);
@@ -151,7 +153,8 @@ class Recorder extends Component<Props, State> {
    * after it starts playing or resumes.
    */
   watchMediaElement = () => {
-    const { mediaState, mediaElement } = this.state;
+    const { mediaState } = this.state;
+    const { mediaElement } = this;
 
     switch (mediaState) {
       case MEDIA_STATES.ended:
@@ -192,7 +195,7 @@ class Recorder extends Component<Props, State> {
   }
 
   renderRecorderButtons() {
-    const { recorder } = this.state;
+    const { recorder } = this;
 
     switch (recorder.state) {
       case 'inactive':
@@ -225,7 +228,7 @@ class Recorder extends Component<Props, State> {
   }
 
   renderRecordingIndicator() {
-    if (this.state.recorder.state === 'recording') {
+    if (this.recorder.state === 'recording') {
       return <span className="recording-indicator">⏺</span>;
     }
 
