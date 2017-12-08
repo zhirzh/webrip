@@ -2,42 +2,15 @@
 
 /* eslint-disable no-param-reassign */
 
-import polyfillAudioElement from './polyfill-audio-element';
-
-function captureAudioStream(videoElement) {
-  polyfillAudioElement(videoElement, true);
-
-  const audioStream = videoElement.captureStream();
-
-  return audioStream;
-}
-
-function captureVideoStream(videoElement, width, height) {
-  const canvas = document.createElement('canvas');
-
-  canvas.width = width;
-  canvas.height = height;
-
-  renderVideoFrame(canvas, videoElement);
-
-  return canvas.captureStream(30);
-}
+import captureAudio from './capture-audio';
+import captureVideo from './capture-video';
 
 function polyfill(videoElement) {
-  return async () => {
-    let width = -1;
-    let height = -1;
+  return () => {
+    const audioStream = captureAudio(videoElement);
+    const videoStream = captureVideo(videoElement);
 
-    const audioTracks = await new Promise((res) => {
-      videoElement.addEventListener('loadeddata', () => {
-        width = videoElement.videoWidth;
-        height = videoElement.videoHeight;
-
-        res(captureAudioStream(videoElement).getAudioTracks());
-      });
-    });
-
-    const videoStream = captureVideoStream(videoElement, width, height);
+    const audioTracks = audioStream.getAudioTracks();
 
     audioTracks.forEach((track) => {
       videoStream.addTrack(track);
@@ -47,23 +20,34 @@ function polyfill(videoElement) {
   };
 }
 
-function polyfillVideoOnly(videoElement) {
-  const captureAudioStream = videoElement.captureStream.bind(videoElement); // eslint-disable-line no-shadow
+function polyfillAudio(videoElement, captureStream) {
+  return () => {
+    const audioStream = captureAudio(videoElement);
+    const videoStream = captureStream();
 
-  return async () => {
-    let width = -1;
-    let height = -1;
+    const audioTracks = audioStream.getAudioTracks();
 
-    const audioTracks = await new Promise((res) => {
-      videoElement.addEventListener('loadeddata', () => {
-        width = videoElement.videoWidth;
-        height = videoElement.videoHeight;
-
-        res(captureAudioStream().getAudioTracks());
-      });
+    audioTracks.forEach((track) => {
+      // $FlowFixMe
+      videoStream.addTrack(track);
     });
 
-    const videoStream = captureVideoStream(videoElement, width, height);
+    return videoStream;
+  };
+}
+
+function polyfillVideo(videoElement, captureStream) {
+  return async () => {
+    const audioStream = captureStream();
+    const videoStream = captureVideo(videoElement);
+
+    // must wait for streams to populate with data
+    const audioTracks = await new Promise((res) => {
+      videoElement.addEventListener('loadeddata', () => {
+        // $FlowFixMe
+        res(audioStream.getAudioTracks());
+      });
+    });
 
     audioTracks.forEach((track) => {
       videoStream.addTrack(track);
@@ -75,35 +59,35 @@ function polyfillVideoOnly(videoElement) {
 
 function polyfillVideoElement(
   videoElement: HTMLVideoElement,
-  forceVideo?: boolean = false,
-  forceAudio?: boolean = false,
+  shouldPolyfillVideo?: boolean = false,
+  shouldPolyfillAudio?: boolean = false,
 ) {
-  if (videoElement.captureStream === undefined) {
+  const shouldPolyfill = shouldPolyfillAudio && shouldPolyfillVideo;
+
+  if (shouldPolyfill || videoElement.captureStream === undefined) {
     // $FlowFixMe
     videoElement.captureStream = polyfill(videoElement);
 
     return videoElement;
   }
 
-  if (forceVideo) {
+  if (shouldPolyfillVideo) {
     // $FlowFixMe
-    videoElement.captureStream = polyfillVideoOnly(videoElement);
+    videoElement.captureStream = polyfillVideo(
+      videoElement,
+      videoElement.captureStream.bind(videoElement),
+    );
   }
 
-  if (forceAudio) {
+  if (shouldPolyfillAudio) {
     // $FlowFixMe
-    videoElement.captureStream = polyfill(videoElement);
+    videoElement.captureStream = polyfillAudio(
+      videoElement,
+      videoElement.captureStream.bind(videoElement),
+    );
   }
 
   return videoElement;
-}
-
-function renderVideoFrame(canvas: HTMLCanvasElement, videoElement: HTMLVideoElement) {
-  const ctx = canvas.getContext('2d');
-
-  ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-
-  requestAnimationFrame(() => renderVideoFrame(canvas, videoElement));
 }
 
 export default polyfillVideoElement;

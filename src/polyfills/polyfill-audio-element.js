@@ -1,22 +1,17 @@
 // @flow
 
+import captureAudio from './capture-audio';
+
 function polyfill(audioElement) {
   return () => {
-    const audioCtx = new AudioContext();
-    const source = audioCtx.createMediaElementSource(audioElement);
-    const destination = audioCtx.createMediaStreamDestination();
-
-    source.connect(destination);
-    source.connect(audioCtx.destination);
-
-    const audioStream = destination.stream;
+    const audioStream = captureAudio(audioElement);
 
     return audioStream;
   };
 }
 
-function polyfillAudioElement(audioElement: HTMLMediaElement, force?: boolean = false) {
-  if (force || audioElement.captureStream === undefined) {
+function polyfillAudioElement(audioElement: HTMLMediaElement, shouldPolyfill?: boolean = false) {
+  if (shouldPolyfill || audioElement.captureStream === undefined) {
     // $FlowFixMe
     audioElement.captureStream = polyfill(audioElement); // eslint-disable-line no-param-reassign
   }
