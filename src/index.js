@@ -7,6 +7,7 @@ import Recorder from './Recorder';
 import Root from './Root';
 
 import polyfillAudioElement from './polyfills/polyfill-audio-element';
+import polyfillVideoElement from './polyfills/polyfill-video-element';
 
 import './index.css';
 
@@ -41,7 +42,8 @@ function setMediaElements() {
   const audioElements = Array.from(document.getElementsByTagName('audio'), audioElement =>
     polyfillAudioElement(audioElement, true));
 
-  const videoElements = document.getElementsByTagName('video');
+  const videoElements = Array.from(document.getElementsByTagName('video'), videoElement =>
+    polyfillVideoElement(videoElement, true, true));
 
   const newMediaElements = [...audioElements, ...videoElements];
 

@@ -33,20 +33,13 @@ class Recorder extends Component<Props, State> {
   constructor(props: Props) {
     super();
 
-    const { mediaElement } = props;
-
-    const mediaStream = mediaElement.captureStream();
-    const recorder = new MediaRecorder(mediaStream);
-    recorder.ondataavailable = ({ data }) => {
-      this.blobs.push(data);
-    };
-
     this.state = {
       mediaState: MEDIA_STATES.idle,
     };
 
-    this.mediaElement = mediaElement;
-    this.recorder = recorder;
+    this.mediaElement = props.mediaElement;
+
+    this.constructRecorder();
   }
 
   componentWillUpdate(nextProps: Props, nextState: State) {
@@ -69,6 +62,7 @@ class Recorder extends Component<Props, State> {
         recorder.resume();
         break;
 
+      case MEDIA_STATES.idle:
       case MEDIA_STATES.started:
         break;
 
@@ -85,6 +79,21 @@ class Recorder extends Component<Props, State> {
     mediaElement.removeEventListener('playing', this.resumeRecording);
 
     clearTimeout(this.watchId);
+  }
+
+  async constructRecorder() {
+    const { mediaElement } = this;
+
+    const mediaStream = await mediaElement.captureStream();
+
+    const recorder = new MediaRecorder(mediaStream);
+    recorder.ondataavailable = ({ data }) => {
+      this.blobs.push(data);
+    };
+
+    this.recorder = recorder;
+
+    this.forceUpdate();
   }
 
   pauseRecording = () => this.updateMediaState(MEDIA_STATES.paused);
@@ -158,6 +167,7 @@ class Recorder extends Component<Props, State> {
 
     switch (mediaState) {
       case MEDIA_STATES.ended:
+      case MEDIA_STATES.idle:
       case MEDIA_STATES.loading:
       case MEDIA_STATES.paused:
         // nothing to do
@@ -197,6 +207,10 @@ class Recorder extends Component<Props, State> {
   renderRecorderButtons() {
     const { recorder } = this;
 
+    if (recorder === undefined) {
+      return null;
+    }
+
     switch (recorder.state) {
       case 'inactive':
         return (
@@ -228,7 +242,13 @@ class Recorder extends Component<Props, State> {
   }
 
   renderRecordingIndicator() {
-    if (this.recorder.state === 'recording') {
+    const { recorder } = this;
+
+    if (recorder === undefined) {
+      return null;
+    }
+
+    if (recorder.state === 'recording') {
       return <span className="recording-indicator">⏺</span>;
     }
 
