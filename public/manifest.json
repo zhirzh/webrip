@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "WebRip",
-  "version": "0.1.0",
+  "version": "3.0.0",
   "content_scripts": [
     {
       "matches": [
