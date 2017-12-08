@@ -106,6 +106,20 @@
     "extends": [
       "airbnb",
       "react-app"
-    ]
+    ],
+    "rules": {
+      "react/sort-comp": [
+        "error",
+        {
+          "order": [
+            "type-annotations",
+            "static-methods",
+            "lifecycle",
+            "everything-else",
+            "render"
+          ]
+        }
+      ]
+    }
   }
 }
