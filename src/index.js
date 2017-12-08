@@ -11,7 +11,7 @@ import polyfillVideoElement from './polyfills/polyfill-video-element';
 
 import './index.css';
 
-const mediaElements = [];
+const mediaElements = new Set();
 
 function mountRecorder(mediaElement) {
   const root = new Root(mediaElement);
@@ -48,11 +48,11 @@ function setMediaElements() {
   const newMediaElements = [...audioElements, ...videoElements];
 
   newMediaElements
-    .filter(mediaElement => !mediaElements.includes(mediaElement))
+    .filter(mediaElement => !mediaElements.has(mediaElement))
     .forEach((mediaElement) => {
       mountRecorder(mediaElement);
 
-      mediaElements.push(mediaElement);
+      mediaElements.add(mediaElement);
     });
 }
 
@@ -61,7 +61,7 @@ function setMediaElements() {
 
   const mutObs = new MutationObserver(setMediaElements);
 
-  // $FlowFixMe - v0.60.1 does not treat `HTMLBodyElement` as `Node`
+  // $FlowFixMe
   mutObs.observe(document.body, {
     childList: true,
     subtree: true,
