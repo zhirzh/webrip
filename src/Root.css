@@ -6,6 +6,6 @@
   pointer-events: none;
 }
 
-.root--hidden {
+.hidden {
   display: none;
 }

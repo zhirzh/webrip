@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 
 import MediaRecorder from './types/MediaRecorder';
 
-import './Recorder.css';
+import styles from './Recorder.css';
 
 type MediaState = $Keys<typeof MEDIA_STATES>;
 
@@ -192,7 +192,7 @@ class Recorder extends Component<Props, State> {
     if (this.state.mediaState === MEDIA_STATES.ended) {
       return (
         <button
-          className="button download-button"
+          className={styles.downloadButton}
           onClick={this.promptDownload}
           title="Download recorded media"
         >
@@ -215,7 +215,7 @@ class Recorder extends Component<Props, State> {
       case 'inactive':
         return (
           <button
-            className="button start-button"
+            className={styles.startRecordingButton}
             onClick={this.startRecording}
             title="Start recording"
           >
@@ -227,7 +227,7 @@ class Recorder extends Component<Props, State> {
       case 'recording':
         return (
           <button
-            className="button stop-button"
+            className={styles.stopRecordingButton}
             onClick={this.stopRecording}
             title="Stop recording"
           >
@@ -249,7 +249,7 @@ class Recorder extends Component<Props, State> {
     }
 
     if (recorder.state === 'recording') {
-      return <span className="recording-indicator">⏺</span>;
+      return <span className={styles.recordingIndicator}>⏺</span>;
     }
 
     return null;
@@ -257,7 +257,7 @@ class Recorder extends Component<Props, State> {
 
   render() {
     return (
-      <div className="recorder" onClick={this.stopPropagation}>
+      <div className={styles.recorder} onClick={this.stopPropagation}>
         {this.renderRecorderButtons()}
         {this.renderDownloadButton()}
         {this.renderRecordingIndicator()}

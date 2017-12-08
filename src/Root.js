@@ -1,7 +1,7 @@
 // @flow
 /* eslint class-methods-use-this: ["error", { "exceptMethods": ["constructDiv"] }] */
 
-import './Root.css';
+import styles from './Root.css';
 
 class Root {
   div: HTMLDivElement;
@@ -13,8 +13,8 @@ class Root {
   constructDiv(mediaElement: HTMLMediaElement) {
     const div = document.createElement('div');
 
-    div.classList.add('root');
-    div.classList.add('root--hidden');
+    div.classList.add(styles.root);
+    div.classList.add(styles.hidden);
 
     const rect = mediaElement.getBoundingClientRect();
 
@@ -28,16 +28,16 @@ class Root {
 
   hide = () => {
     // bail
-    if (this.div.classList.contains('root--hidden')) {
+    if (this.div.classList.contains(styles.hidden)) {
       return;
     }
 
-    this.div.classList.add('root--hidden');
+    this.div.classList.add(styles.hidden);
   };
 
   show = () => {
-    if (this.div.classList.contains('root--hidden')) {
-      this.div.classList.remove('root--hidden');
+    if (this.div.classList.contains(styles.hidden)) {
+      this.div.classList.remove(styles.hidden);
     }
   };
 
