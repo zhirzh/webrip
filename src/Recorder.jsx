@@ -2,8 +2,6 @@
 
 import React, { Component } from 'react';
 
-import MediaRecorder from './types/MediaRecorder';
-
 import styles from './Recorder.css';
 
 type MediaState = $Keys<typeof MEDIA_STATES>;
