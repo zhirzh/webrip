@@ -107,6 +107,9 @@
       "airbnb",
       "react-app"
     ],
+    "globals": {
+      "chrome": true
+    },
     "rules": {
       "react/sort-comp": [
         "error",

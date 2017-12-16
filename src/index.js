@@ -9,6 +9,8 @@ import Root from './Root';
 import polyfillAudioElement from './polyfills/polyfill-audio-element';
 import polyfillVideoElement from './polyfills/polyfill-video-element';
 
+import './state';
+
 import './index.css';
 
 const mediaElements = new Set();
@@ -39,20 +41,25 @@ function mountRecorder(mediaElement) {
 }
 
 function setMediaElements() {
-  const audioElements = Array.from(document.getElementsByTagName('audio'), audioElement =>
-    polyfillAudioElement(audioElement, true));
-
-  const videoElements = Array.from(document.getElementsByTagName('video'), videoElement =>
-    polyfillVideoElement(videoElement, true, true));
+  const audioElements = Array.from(document.getElementsByTagName('audio'));
+  const videoElements = Array.from(document.getElementsByTagName('video'));
 
   const newMediaElements = [...audioElements, ...videoElements];
 
   newMediaElements
     .filter(mediaElement => !mediaElements.has(mediaElement))
-    .forEach((mediaElement) => {
-      mountRecorder(mediaElement);
-
+    .forEach(async (mediaElement) => {
       mediaElements.add(mediaElement);
+
+      if (mediaElement instanceof HTMLAudioElement) {
+        await polyfillAudioElement(mediaElement);
+      }
+
+      if (mediaElement instanceof HTMLVideoElement) {
+        await polyfillVideoElement(mediaElement);
+      }
+
+      mountRecorder(mediaElement);
     });
 }
 

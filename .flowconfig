@@ -11,6 +11,8 @@
 [include]
 
 [libs]
+src/types/Chrome.js
+src/types/MediaRecorder.js
 
 [lints]
 

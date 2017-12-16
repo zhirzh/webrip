@@ -43,6 +43,11 @@ function polyfillVideo(videoElement, captureStream) {
 
     // must wait for streams to populate with data
     const audioTracks = await new Promise((res) => {
+      if (videoElement.readyState > 1) {
+        // $FlowFixMe
+        res(audioStream.getAudioTracks());
+      }
+
       videoElement.addEventListener('loadeddata', () => {
         // $FlowFixMe
         res(audioStream.getAudioTracks());
@@ -57,37 +62,42 @@ function polyfillVideo(videoElement, captureStream) {
   };
 }
 
-function polyfillVideoElement(
-  videoElement: HTMLVideoElement,
-  shouldPolyfillVideo?: boolean = false,
-  shouldPolyfillAudio?: boolean = false,
-) {
-  const shouldPolyfill = shouldPolyfillAudio && shouldPolyfillVideo;
+function polyfillVideoElement(videoElement: HTMLVideoElement): Promise<HTMLVideoElement> {
+  return new Promise((res, rej) => {
+    chrome.storage.sync.get('state', ({ state }) => {
+      const { shouldPolyfillAudio, shouldPolyfillVideo } = state;
 
-  if (shouldPolyfill || videoElement.captureStream === undefined) {
-    // $FlowFixMe
-    videoElement.captureStream = polyfill(videoElement);
+      const shouldPolyfillBoth = shouldPolyfillAudio && shouldPolyfillVideo;
 
-    return videoElement;
-  }
+      if (shouldPolyfillBoth || videoElement.captureStream === undefined) {
+        // $FlowFixMe
+        videoElement.captureStream = polyfill(videoElement);
 
-  if (shouldPolyfillVideo) {
-    // $FlowFixMe
-    videoElement.captureStream = polyfillVideo(
-      videoElement,
-      videoElement.captureStream.bind(videoElement),
-    );
-  }
+        res(videoElement);
 
-  if (shouldPolyfillAudio) {
-    // $FlowFixMe
-    videoElement.captureStream = polyfillAudio(
-      videoElement,
-      videoElement.captureStream.bind(videoElement),
-    );
-  }
+        // bail
+        return;
+      }
 
-  return videoElement;
+      if (shouldPolyfillVideo) {
+        // $FlowFixMe
+        videoElement.captureStream = polyfillVideo(
+          videoElement,
+          videoElement.captureStream.bind(videoElement),
+        );
+      }
+
+      if (shouldPolyfillAudio) {
+        // $FlowFixMe
+        videoElement.captureStream = polyfillAudio(
+          videoElement,
+          videoElement.captureStream.bind(videoElement),
+        );
+      }
+
+      res(videoElement);
+    });
+  });
 }
 
 export default polyfillVideoElement;

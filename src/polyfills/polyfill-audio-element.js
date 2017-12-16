@@ -10,13 +10,19 @@ function polyfill(audioElement) {
   };
 }
 
-function polyfillAudioElement(audioElement: HTMLMediaElement, shouldPolyfill?: boolean = false) {
-  if (shouldPolyfill || audioElement.captureStream === undefined) {
-    // $FlowFixMe
-    audioElement.captureStream = polyfill(audioElement); // eslint-disable-line no-param-reassign
-  }
+function polyfillAudioElement(audioElement: HTMLMediaElement): Promise<HTMLMediaElement> {
+  return new Promise((res, rej) => {
+    chrome.storage.sync.get('state', ({ state }) => {
+      const { shouldPolyfillAudio } = state;
 
-  return audioElement;
+      if (shouldPolyfillAudio || audioElement.captureStream === undefined) {
+        // $FlowFixMe
+        audioElement.captureStream = polyfill(audioElement); // eslint-disable-line no-param-reassign
+      }
+
+      res(audioElement);
+    });
+  });
 }
 
 export default polyfillAudioElement;
