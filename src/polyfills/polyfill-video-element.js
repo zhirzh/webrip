@@ -43,6 +43,11 @@ function polyfillVideo(videoElement, captureStream) {
 
     // must wait for streams to populate with data
     const audioTracks = await new Promise((res) => {
+      if (videoElement.readyState > 1) {
+        // $FlowFixMe
+        res(audioStream.getAudioTracks());
+      }
+
       videoElement.addEventListener('loadeddata', () => {
         // $FlowFixMe
         res(audioStream.getAudioTracks());
