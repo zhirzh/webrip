@@ -59,7 +59,7 @@
     "build:app": "node scripts/build.js",
     "chrome": "npm run build && npm run zip",
     "copy-public": "node copy-public.js",
-    "start": "NODE_ENV=development webpack -w --config config/webpack.config.dev.js",
+    "start": "npm run copy-public && NODE_ENV=development webpack -w --config config/webpack.config.dev.js",
     "start:app": "node scripts/start.js",
     "zip": "rm webrip.zip; cd build && zip ../webrip.zip -r *"
   },
